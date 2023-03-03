@@ -1,15 +1,12 @@
 const { expectRevert } = require("@openzeppelin/test-helpers");
-//const { contract } = require("truffle");
-//Mock Tokens for Decentralized Exchange
-const Aug = artifacts.require("Aug");
-const Emp = artifacts.require("Emp");
-const Fnx = artifacts.require("Fnx");
-const Hlx = artifacts.require("Hlx");
-const Qtm = artifacts.require("Qtm");
-const Srs = artifacts.require("Srs");
-const Zrc = artifacts.require("Zrc");
-//Decentralized Exchange
-const DecentralizedExchange = artifacts.require("./DecentralizedExchange");
+const Aug = artifacts.require("Aug.sol");
+const Emp = artifacts.require("Emp.sol");
+const Fnx = artifacts.require("Fnx.sol");
+const Hlx = artifacts.require("Hlx.sol");
+const Qtm = artifacts.require("Qtm.sol");
+const Srs = artifacts.require("Srs.sol");
+const Zrc = artifacts.require("Zrc.sol");
+const DecentralizedExchange = artifacts.require("DecentralizedExchange.sol");
 
 contract("Decentralized Exchange", (accounts) => {
     let aug, emp, fnx, hlx, qtm, srs, zrc, decentralizedexchange;
@@ -47,7 +44,6 @@ contract("Decentralized Exchange", (accounts) => {
         await Promise.all([aug, emp, fnx, hlx, qtm, srs, zrc].map(token => seedTokenBalance(token, trader2)));
     });
 
-   
     it("Should Deposit Tokens.", async () => {
         const amount = web3.utils.toWei("100");
         await decentralizedexchange.deposit(amount, FNX, { from: trader1 });
