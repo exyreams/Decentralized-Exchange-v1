@@ -59,8 +59,19 @@ contract DecentralizedExchange {
         tokenList.push(ticker);
     }
 
+
     modifier onlyAdmin() {
         require(msg.sender == admin, "Only Administrator is allowed.");
+        _;
+    }
+    
+    modifier tokenIsNotFNX(bytes32 ticker) {
+        require(ticker != FNX, "Cannot trade FNX.");
+        _;
+    }
+
+    modifier tokenExist(bytes32 ticker) {
+        require(tokens[ticker].tokenAddress != address(0),"This token doesn't exist.");
         _;
     }
 
@@ -165,15 +176,5 @@ contract DecentralizedExchange {
             orders.pop();
             i = i.add(1);
         }
-    }
-
-    modifier tokenIsNotFNX(bytes32 ticker) {
-        require(ticker != FNX, "Cannot trade FNX.");
-        _;
-    }
-
-    modifier tokenExist(bytes32 ticker) {
-        require(tokens[ticker].tokenAddress != address(0),"This token doesn't exist.");
-        _;
     }
 }

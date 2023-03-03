@@ -2,13 +2,10 @@
 pragma solidity ^0.8.18;
 
 import "./ERC20.sol";
-import "./ERC20Detailed.sol";
 
-contract Aug is ERC20, ERC20Detailed {
-    constructor()
-        ERC20("EMP", "Empyrean")
-        ERC20Detailed("EMP", "Empyrean", 18)
-    {}
+contract Emp is ERC20 {
+    
+    constructor() ERC20("EMP", "Empyrean", 18) {}
 
     function faucet(address to, uint amount) external {
         _mint(to, amount);

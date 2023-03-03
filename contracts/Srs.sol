@@ -2,15 +2,16 @@
 pragma solidity ^0.8.18;
 
 import "./ERC20.sol";
-import "./ERC20Detailed.sol";
 
-abstract contract Srs is ERC20, ERC20Detailed {
 
-  constructor() ERC20Detailed("SRS", "Sirius", 18) {}
+contract Srs is ERC20 {
+
+  constructor() ERC20("SRS", "Sirius", 18) {}
 
   function faucet(address to, uint amount) external {
     _mint(to, amount);
   }
+  
 }
 
 
