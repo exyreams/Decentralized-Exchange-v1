@@ -1,5 +1,5 @@
 const { expectRevert } = require("@openzeppelin/test-helpers");
-const { contract } = require("truffle");
+//const { contract } = require("truffle");
 //Mock Tokens for Decentralized Exchange
 const Aug = artifacts.require("Aug");
 const Emp = artifacts.require("Emp");
@@ -14,8 +14,7 @@ const DecentralizedExchange = artifacts.require("./DecentralizedExchange");
 contract("Decentralized Exchange", (accounts) => {
     let aug, emp, fnx, hlx, qtm, srs, zrc, decentralizedexchange;
     const [trader1, trader2] = [accounts[1], accounts[2]];
-    const [AUG, EMP, FNX, HLX, QTM, SRS, ZRC] = ["AUG", "EMP", "FNX", "HLX", "QTM", "SRS", "ZRC"]
-        .map(ticker => web3.utils.fromAscii(ticker));
+    const [AUG, EMP, FNX, HLX, QTM, SRS, ZRC] = ["AUG", "EMP", "FNX", "HLX", "QTM", "SRS", "ZRC"].map(ticker => web3.utils.fromAscii(ticker));
 
     beforeEach(async () => {
         ([aug, emp, fnx, hlx, qtm, srs, zrc] = await Promise.all([
