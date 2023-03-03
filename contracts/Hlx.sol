@@ -4,9 +4,9 @@ pragma solidity ^0.8.18;
 import "./ERC20.sol";
 import "./ERC20Detailed.sol";
 
-abstract contract Fnx is ERC20, ERC20Detailed {
+contract Aug is ERC20, ERC20Detailed {
 
-  constructor() ERC20Detailed("FNX", "Finix", 18) {}
+  constructor() ERC20("HLX", "Helix") ERC20Detailed("HLX", "Helix", 18) {}
 
   function faucet(address to, uint amount) external {
     _mint(to, amount);
@@ -15,19 +15,17 @@ abstract contract Fnx is ERC20, ERC20Detailed {
 
 
 
-
-
 // pragma solidity ^0.8.18;
 
-// contract Fnx { 
+// contract Hlx { 
     
-//     using FnxSafeMath for uint256;
+//     using HlxSafeMath for uint256;
 
 //     mapping (address => uint256) private _balances;
 //     mapping (address => mapping (address => uint256)) private _allowances;
 
-//     string private constant name = "Finix";
-//     string private constant symbol = "FNX";
+//     string private constant name = "Helix";
+//     string private constant symbol = "HLX";
 //     uint8 private decimals = 18;
 //     uint256 private _totalSupply;
 
@@ -137,7 +135,7 @@ abstract contract Fnx is ERC20, ERC20Detailed {
 //     }
 // }
 
-// library FnxSafeMath {
+// library HlxSafeMath {
 
 //     function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {
 //         unchecked {

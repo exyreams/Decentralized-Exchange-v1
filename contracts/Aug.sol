@@ -4,45 +4,24 @@ pragma solidity ^0.8.18;
 import "./ERC20.sol";
 import "./ERC20Detailed.sol";
 
-abstract contract Emp is ERC20, ERC20Detailed {
+contract Aug is ERC20, ERC20Detailed {
+    constructor() ERC20("AUG", "Auriga") ERC20Detailed("AUG", "Auriga", 18) {}
 
-  constructor() ERC20Detailed("EMP", "Empyrean", 18) {}
-
-  function faucet(address to, uint amount) external {
-    _mint(to, amount);
-  }
+    function faucet(address to, uint amount) external {
+        _mint(to, amount);
+    }
 }
 
+// //Original contract
+// contract Aug {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// pragma solidity ^0.8.18;
-
-// contract Emp { 
-    
-//     using EmpSafeMath for uint256;
+//     using AugSafeMath for uint256;
 
 //     mapping (address => uint256) private _balances;
 //     mapping (address => mapping (address => uint256)) private _allowances;
 
-//     string private constant name = "Empyrean";
-//     string private constant symbol = "EMP";
+//     string private constant name = "Auriga";
+//     string private constant symbol = "AUG";
 //     uint8 private decimals = 18;
 //     uint256 private _totalSupply;
 
@@ -108,7 +87,6 @@ abstract contract Emp is ERC20, ERC20Detailed {
 //         return true;
 //     }
 
-
 //     function _transfer(address sender, address recipient, uint256 amount) internal {
 //         require(sender != address(0), "ERC20: transfer from the zero address");
 //         require(recipient != address(0), "ERC20: transfer to the zero address");
@@ -120,7 +98,7 @@ abstract contract Emp is ERC20, ERC20Detailed {
 
 //     function _mint(address account, uint256 amount) internal {
 //         require(account != address(0), "ERC20: mint to the zero address");
-    
+
 //         _totalSupply = _totalSupply.add(amount);
 //         _balances[account] = _balances[account].add(amount);
 //         emit Transfer(address(0), account, amount);
@@ -152,7 +130,7 @@ abstract contract Emp is ERC20, ERC20Detailed {
 //     }
 // }
 
-// library EmpSafeMath {
+// library AugSafeMath {
 
 //     function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {
 //         unchecked {

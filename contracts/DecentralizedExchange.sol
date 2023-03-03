@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import "./ZeppelinContracts/v2_SafeMath.sol";
-import "./ZeppelinContracts/v2_IERC20.sol";
+import "./SafeMath.sol";
+import "./IERC20.sol";
 
 contract DecentralizedExchange {
 
