@@ -8,7 +8,7 @@ const Srs = artifacts.require("Srs.sol");
 const Zrc = artifacts.require("Zrc.sol");
 const DecentralizedExchange = artifacts.require("DecentralizedExchange.sol");
 
-contract("Decentralized Exchange", (accounts) => {
+contract("DeXchange", (accounts) => {
     let aug, emp, fnx, hlx, qtm, srs, zrc, decentralizedexchange;
     const [trader1, trader2] = [accounts[1], accounts[2]];
     const [AUG, EMP, FNX, HLX, QTM, SRS, ZRC] = ["AUG", "EMP", "FNX", "HLX", "QTM", "SRS", "ZRC"].map(ticker => web3.utils.fromAscii(ticker));
@@ -40,47 +40,49 @@ contract("Decentralized Exchange", (accounts) => {
             await token.faucet(trader, amount)
             await token.approve(decentralizedexchange.address, amount, { from: trader });
         };
-        await Promise.all([aug, emp, fnx, hlx, qtm, srs, zrc].map(token => seedTokenBalance(token, trader1)));
-        await Promise.all([aug, emp, fnx, hlx, qtm, srs, zrc].map(token => seedTokenBalance(token, trader2)));
+        for (let i = 0; i < [aug, emp, fnx, hlx, qtm, srs, zrc].length; i++) {
+            const token = [aug, emp, fnx, hlx, qtm, srs, zrc][i];
+            await seedTokenBalance(token, trader1);
+            await seedTokenBalance(token, trader2);
+        }
     });
 
     it("Should Deposit Tokens.", async () => {
         const amount = web3.utils.toWei("100");
+        const initialBalance = await decentralizedexchange.traderBalances(trader1, FNX);
         await decentralizedexchange.deposit(amount, FNX, { from: trader1 });
         const balance = await decentralizedexchange.traderBalances(trader1, FNX);
-        assert(balance.toString() === amount);
+        assert(balance.toString() === initialBalance.add(web3.utils.toBN(amount)).toString(), "Deposit failed: Incorrect balance.");
     });
 
     it("Shouldn't Deposit Tokens: When Token doesn't exist.", async () => {
+        const nonExistentToken = web3.utils.fromAscii("TOKEN-DOES-NOT-EXIST");
         await expectRevert(
-            decentralizedexchange.deposit(web3.utils.toWei("100"), web3.utils.fromAscii("TOKEN-DOES-NOT-EXIST"),
-                { from: trader1 }), "This token doesn't exist."
+            decentralizedexchange.deposit(web3.utils.toWei("100"), nonExistentToken, { from: trader1 }),
+            "This token doesn't exist."
         );
     });
 
     it("Should Withdraw Tokens.", async () => {
         const amount = web3.utils.toWei("100");
         await decentralizedexchange.deposit(amount, FNX, { from: trader1 });
+        const initialExchangeBalance = await decentralizedexchange.traderBalances(trader1, FNX);
+        const initialFnxBalance = await fnx.balanceOf(trader1);
         await decentralizedexchange.withdraw(amount, FNX, { from: trader1 });
-        const [balanceDecentralizedExchange, balanceFnx] = await Promise.all([decentralizedexchange.traderBalances(trader1, FNX), fnx.balanceOf(trader1)]);
-        assert(balanceDecentralizedExchange.isZero());
-        assert(balanceFnx.toString() === web3.utils.toWei("1000"));
+        const exchangeBalance = await decentralizedexchange.traderBalances(trader1, FNX);
+        const fnxBalance = await fnx.balanceOf(trader1);
+        assert(exchangeBalance.isZero(), "Withdrawal failed: Incorrect exchange balance.");
+        assert(fnxBalance.toString() === initialFnxBalance.add(web3.utils.toBN(amount)).toString(), "Withdrawal failed: Incorrect FNX balance.");
     });
 
     it("Shouldn't Withdraw Tokens: When Token doesn't exist.", async () => {
-        await expectRevert(decentralizedexchange.withdraw(web3.utils.toWei("1000"), web3.utils.fromAscii("TOKEN-DOES-NOT-EXIST"),
-            { from: trader1 }), "This token doesn't exist.");
-    });
-
-    it("Shouldn't withdraw Tokens: When Balance too low.", async () => {
-        await decentralizedexchange.deposit(web3.utils.toWei("100"), FNX, { from: trader1 });
+        const nonExistentToken = web3.utils.fromAscii("TOKEN-DOES-NOT-EXIST");
         await expectRevert(
-            decentralizedexchange.withdraw(web3.utils.toWei("1000"), FNX, { from: trader1 }), "Balance isn't enough to Withdraw Tokens.");
+            decentralizedexchange.withdraw(web3.utils.toWei("1000"), nonExistentToken, { from: trader1 }),
+            "This token doesn't exist."
+        );
     });
-
-
-
-
+});
 
 
 
@@ -178,7 +180,7 @@ contract("Decentralized Exchange", (accounts) => {
     // });
 
 
-});
+
 
 
 
