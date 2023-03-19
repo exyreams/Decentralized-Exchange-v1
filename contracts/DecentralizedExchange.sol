@@ -54,12 +54,6 @@ contract DecentralizedExchange {
         admin = msg.sender;
     }
 
-    function addToken(bytes32 ticker, address tokenAddress) external onlyAdmin {
-        tokens[ticker] = Token(ticker, tokenAddress);
-        tokenList.push(ticker);
-    }
-
-
     modifier onlyAdmin() {
         require(msg.sender == admin, "Only Administrator is allowed.");
         _;
@@ -73,6 +67,26 @@ contract DecentralizedExchange {
     modifier tokenExist(bytes32 ticker) {
         require(tokens[ticker].tokenAddress != address(0),"This token doesn't exist.");
         _;
+    }
+
+    function getOrders(bytes32 ticker, Side side) external view returns(Order[] memory) {
+      return orderBook[ticker][uint(side)];
+    }
+
+    function getTokens() external view returns(Token[] memory) {
+      Token[] memory _tokens = new Token[](tokenList.length);
+      for (uint i = 0; i < tokenList.length; i++) {
+        _tokens[i] = Token(
+          tokens[tokenList[i]].ticker,
+          tokens[tokenList[i]].tokenAddress
+        );
+      }
+      return _tokens;
+    }
+
+    function addToken(bytes32 ticker, address tokenAddress) external onlyAdmin {
+        tokens[ticker] = Token(ticker, tokenAddress);
+        tokenList.push(ticker);
     }
 
     function deposit(uint256 amount, bytes32 ticker) external tokenExist(ticker) {
@@ -93,7 +107,7 @@ contract DecentralizedExchange {
 
     function createLimitOrder(bytes32 ticker,uint256 amount,uint256 price,Side side) external tokenExist(ticker) tokenIsNotFNX(ticker) {
         if (side == Side.SELL) {
-            require(traderBalances[msg.sender][ticker] >= amount,"Token balance it too low.");
+            require(traderBalances[msg.sender][ticker] >= amount,"Token balance is too low.");
         } else {
             require(traderBalances[msg.sender][FNX] >= amount.mul(price),"FNX balance is too low.");
         }

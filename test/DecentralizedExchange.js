@@ -7,8 +7,9 @@ const Qtm = artifacts.require("Qtm.sol");
 const Srs = artifacts.require("Srs.sol");
 const Zrc = artifacts.require("Zrc.sol");
 const DecentralizedExchange = artifacts.require("DecentralizedExchange.sol");
+const SIDE = { BUY: 0, SELL: 1 };
 
-contract("DeXchange", (accounts) => {
+contract("Decentralized Exchange", (accounts) => {
     let aug, emp, fnx, hlx, qtm, srs, zrc, decentralizedexchange;
     const [trader1, trader2] = [accounts[1], accounts[2]];
     const [AUG, EMP, FNX, HLX, QTM, SRS, ZRC] = ["AUG", "EMP", "FNX", "HLX", "QTM", "SRS", "ZRC"].map(ticker => web3.utils.fromAscii(ticker));
@@ -47,6 +48,7 @@ contract("DeXchange", (accounts) => {
         }
     });
 
+    //function for testing deposits
     it("Should Deposit Tokens.", async () => {
         const amount = web3.utils.toWei("100");
         const initialBalance = await decentralizedexchange.traderBalances(trader1, FNX);
@@ -62,7 +64,7 @@ contract("DeXchange", (accounts) => {
             "This token doesn't exist."
         );
     });
-
+    //function for testing withdraw
     it("Should Withdraw Tokens.", async () => {
         const amount = web3.utils.toWei("100");
         await decentralizedexchange.deposit(amount, FNX, { from: trader1 });
@@ -82,102 +84,109 @@ contract("DeXchange", (accounts) => {
             "This token doesn't exist."
         );
     });
+    //function for testing LimitOrders
+    it("Should Create Limit Order.", async () => {
+        await decentralizedexchange.deposit(web3.utils.toWei("100"), FNX, { from: trader1 });
+        await decentralizedexchange.createLimitOrder(HLX, web3.utils.toWei("10"), 10, SIDE.BUY, { from: trader1 });
+        let buyOrders = await decentralizedexchange.getOrders(HLX, SIDE.BUY);
+        let sellOrders = await decentralizedexchange.getOrders(HLX, SIDE.SELL);
+
+        assert(buyOrders.length === 1);
+        assert(buyOrders[0].trader === trader1);
+        assert(buyOrders[0].ticker === web3.utils.padRight(HLX, 64));
+        assert(buyOrders[0].price === "10");
+        assert(buyOrders[0].amount === web3.utils.toWei("10"));
+        assert(sellOrders.length === 0);
+
+        await decentralizedexchange.deposit(web3.utils.toWei("200"), FNX, { from: trader2 });
+        await decentralizedexchange.createLimitOrder(HLX, web3.utils.toWei("10"), 11, SIDE.BUY, { from: trader2 });
+
+        buyOrders = await decentralizedexchange.getOrders(HLX, SIDE.BUY);
+        sellOrders = await decentralizedexchange.getOrders(HLX, SIDE.SELL);
+        assert(buyOrders.length === 2);
+        assert(buyOrders[0].trader === trader2);
+        assert(buyOrders[1].trader === trader1);
+        assert(sellOrders.length === 0);
+
+        await decentralizedexchange.deposit(web3.utils.toWei("200"), FNX, { from: trader2 });
+        await decentralizedexchange.createLimitOrder(HLX, web3.utils.toWei("10"), 9, SIDE.BUY, { from: trader2 });
+
+        buyOrders = await decentralizedexchange.getOrders(HLX, SIDE.BUY);
+        sellOrders = await decentralizedexchange.getOrders(HLX, SIDE.SELL);
+        assert(buyOrders.length === 3);
+        assert(buyOrders[0].trader === trader2);
+        assert(buyOrders[1].trader === trader1);
+        assert(buyOrders[2].trader === trader2);
+        assert(sellOrders.length === 0);
+    });
+
+    it("Shouldn't Create Limit Order: When token balance is too low.", async () => {
+        await decentralizedexchange.deposit(web3.utils.toWei("99"), HLX, { from: trader1 });
+        await expectRevert(decentralizedexchange.createLimitOrder(HLX, web3.utils.toWei("100"), 10, SIDE.SELL, { from: trader1 }), "Token balance is too low.");
+    });
+
+    it("Shouldn't Create Limit Order: When token balance is too Low.", async () => {
+        await decentralizedexchange.deposit(web3.utils.toWei("99"), HLX, { from: trader1 });
+        await expectRevert(decentralizedexchange.createLimitOrder(HLX, web3.utils.toWei("100"), 10, SIDE.SELL, { from: trader1 }), "Token balance is too low");
+    });
+    
+    it("Shouldn't Create Limit Order: When FNX balance too low.", async () => {
+        await decentralizedexchange.deposit(web3.utils.toWei("99"), FNX, { from: trader1 });
+        await expectRevert(decentralizedexchange.createLimitOrder(HLX, web3.utils.toWei("10"), 10, SIDE.BUY, { from: trader1 }), "FNX balance is too low.");
+    });
+    
+    it("Shouldn't Create Limit Order: When token is FNX.", async () => {
+        await expectRevert(decentralizedexchange.createLimitOrder(FNX, web3.utils.toWei("1000"), 10, SIDE.BUY, { from: trader1 }), "Cannot trade FNX.");
+    });
+    
+    it("Shouldn't Create Limit Order: When token doesn't exist.", async () => {
+        await expectRevert(decentralizedexchange.createLimitOrder(web3.utils.fromAscii("TOKEN-DOES-NOT-EXIST"), web3.utils.toWei("1000"), 10, SIDE.BUY,
+            { from: trader1 }), "This token doesn't exist.");
+    });
+    //function for testing marketOrders
+    it("Should create Market Order & Match.", async () => {
+        await decentralizedexchange.deposit(web3.utils.toWei("100"), FNX, { from: trader1 });
+        await decentralizedexchange.createLimitOrder(HLX, web3.utils.toWei("10"), 10, SIDE.BUY, { from: trader1 });
+        await decentralizedexchange.deposit(web3.utils.toWei("100"), HLX, { from: trader2 });
+        await decentralizedexchange.createMarketOrder(HLX, web3.utils.toWei("5"), SIDE.SELL, { from: trader2 });
+    
+        const balances = await Promise.all([
+            decentralizedexchange.traderBalances(trader1, FNX),
+            decentralizedexchange.traderBalances(trader1, HLX),
+            decentralizedexchange.traderBalances(trader2, FNX),
+            decentralizedexchange.traderBalances(trader2, HLX),
+        ]);
+    
+        const orders = await decentralizedexchange.getOrders(HLX, SIDE.BUY);
+        assert(orders.length === 1);
+        assert(orders[0].filled = web3.utils.toWei("5"));
+        assert(balances[0].toString() === web3.utils.toWei("50"));
+        assert(balances[1].toString() === web3.utils.toWei("5"));
+        assert(balances[2].toString() === web3.utils.toWei("50"));
+        assert(balances[3].toString() === web3.utils.toWei("95"));
+    });
+    
+    it("Shouldn't Create Market Order: When token balance too low.", async () => {
+        await expectRevert(decentralizedexchange.createMarketOrder(HLX, web3.utils.toWei("101"), SIDE.SELL, { from: trader2 }), "Token balance is too low");
+    });
+    
+    it("Shouldn't Create Market Order: When FNX balance too low.", async () => {
+        await decentralizedexchange.deposit(web3.utils.toWei("100"), HLX, { from: trader1 });
+        await decentralizedexchange.createLimitOrder(HLX, web3.utils.toWei("100"), 10, SIDE.SELL, { from: trader1 });
+        await expectRevert(decentralizedexchange.createMarketOrder(HLX, web3.utils.toWei("101"), SIDE.BUY, { from: trader2 }), "FNX balance too low.");
+    });
+    
+    it("Shouldn't Create Market Order: When token is FNX.", async () => {
+        await expectRevert(decentralizedexchange.createMarketOrder(FNX, web3.utils.toWei("1000"), SIDE.BUY, { from: trader1 }), "Cannot trade FNX.");
+    });
+    
+    it("Shouldn't Create Market Order: When token does not not exist.", async () => {
+        await expectRevert(decentralizedexchange.createMarketOrder(web3.utils.fromAscii("TOKEN-DOES-NOT-EXIST"), web3.utils.toWei("1000"), SIDE.BUY, { from: trader1 }), "This token doesn't exist.");
+    });
+
 });
 
 
-
-    // it("should create limit order", async () => {
-    //     await dex.deposit(web3.utils.toWei("100"), DAI, { from: trader1 });
-    //     await dex.createLimitOrder(REP, web3.utils.toWei("10"), 10, SIDE.BUY, { from: trader1 });
-    //     let buyOrders = await dex.getOrders(REP, SIDE.BUY);
-    //     let sellOrders = await dex.getOrders(REP, SIDE.SELL);
-    //     assert(buyOrders.length === 1);
-    //     assert(buyOrders[0].trader === trader1);
-    //     assert(buyOrders[0].ticker === web3.utils.padRight(REP, 64));
-    //     assert(buyOrders[0].price === "10");
-    //     assert(buyOrders[0].amount === web3.utils.toWei("10"));
-    //     assert(sellOrders.length === 0);
-
-    //     await dex.deposit(web3.utils.toWei("200"), DAI, { from: trader2 });
-    //     await dex.createLimitOrder(REP, web3.utils.toWei("10"), 11, SIDE.BUY, { from: trader2 });
-
-    //     buyOrders = await dex.getOrders(REP, SIDE.BUY);
-    //     sellOrders = await dex.getOrders(REP, SIDE.SELL);
-    //     assert(buyOrders.length === 2);
-    //     assert(buyOrders[0].trader === trader2);
-    //     assert(buyOrders[1].trader === trader1);
-    //     assert(sellOrders.length === 0);
-
-    //     await dex.deposit(web3.utils.toWei("200"), DAI, { from: trader2 });
-    //     await dex.createLimitOrder(REP, web3.utils.toWei("10"), 9, SIDE.BUY, { from: trader2 });
-
-    //     buyOrders = await dex.getOrders(REP, SIDE.BUY);
-    //     sellOrders = await dex.getOrders(REP, SIDE.SELL);
-    //     assert(buyOrders.length === 3);
-    //     assert(buyOrders[0].trader === trader2);
-    //     assert(buyOrders[1].trader === trader1);
-    //     assert(buyOrders[2].trader === trader2);
-    //     assert(sellOrders.length === 0);
-    // });
-
-    // it("should NOT create limit order if token balance too low", async () => {
-    //     await dex.deposit(web3.utils.toWei("99"), REP, { from: trader1 });
-    //     await expectRevert(dex.createLimitOrder(REP, web3.utils.toWei("100"), 10, SIDE.SELL, { from: trader1 }), "token balance too low");
-    // });
-
-    // it("should NOT create limit order if dai balance too low", async () => {
-    //     await dex.deposit(web3.utils.toWei("99"), DAI, { from: trader1 });
-    //     await expectRevert(dex.createLimitOrder(REP, web3.utils.toWei("10"), 10, SIDE.BUY, { from: trader1 }), "dai balance too low");
-    // });
-
-    // it("should NOT create limit order if token is DAI", async () => {
-    //     await expectRevert(dex.createLimitOrder(DAI, web3.utils.toWei("1000"), 10, SIDE.BUY, { from: trader1 }), "cannot trade DAI");
-    // });
-
-    // it("should NOT create limit order if token does not not exist", async () => {
-    //     await expectRevert(dex.createLimitOrder(web3.utils.fromAscii("TOKEN-DOES-NOT-EXIST"), web3.utils.toWei("1000"), 10, SIDE.BUY,
-    //         { from: trader1 }), "this token does not exist");
-    // });
-
-    // it("should create market order & match", async () => {
-    //     await dex.deposit(web3.utils.toWei("100"), DAI, { from: trader1 });
-    //     await dex.createLimitOrder(REP, web3.utils.toWei("10"), 10, SIDE.BUY, { from: trader1 });
-    //     await dex.deposit(web3.utils.toWei("100"), REP, { from: trader2 });
-    //     await dex.createMarketOrder(REP, web3.utils.toWei("5"), SIDE.SELL, { from: trader2 });
-
-    //     const balances = await Promise.all([
-    //         dex.traderBalances(trader1, DAI),
-    //         dex.traderBalances(trader1, REP),
-    //         dex.traderBalances(trader2, DAI),
-    //         dex.traderBalances(trader2, REP),
-    //     ]);
-
-    //     const orders = await dex.getOrders(REP, SIDE.BUY);
-    //     assert(orders.length === 1);
-    //     assert(orders[0].filled = web3.utils.toWei("5"));
-    //     assert(balances[0].toString() === web3.utils.toWei("50"));
-    //     assert(balances[1].toString() === web3.utils.toWei("5"));
-    //     assert(balances[2].toString() === web3.utils.toWei("50"));
-    //     assert(balances[3].toString() === web3.utils.toWei("95"));
-    // });
-
-    // it("should NOT create market order if token balance too low", async () => {
-    //     await expectRevert(dex.createMarketOrder(REP, web3.utils.toWei("101"), SIDE.SELL, { from: trader2 }), "token balance too low");
-    // });
-
-    // it("should NOT create market order if dai balance too low", async () => {
-    //     await dex.deposit(web3.utils.toWei("100"), REP, { from: trader1 });
-    //     await dex.createLimitOrder(REP, web3.utils.toWei("100"), 10, SIDE.SELL, { from: trader1 });
-    //     await expectRevert(dex.createMarketOrder(REP, web3.utils.toWei("101"), SIDE.BUY, { from: trader2 }), "dai balance too low");
-    // });
-
-    // it("should NOT create market order if token is DAI", async () => {
-    //     await expectRevert(dex.createMarketOrder(DAI, web3.utils.toWei("1000"), SIDE.BUY, { from: trader1 }), "cannot trade DAI");
-    // });
-
-    // it("should NOT create market order if token does not not exist", async () => {
-    //     await expectRevert(dex.createMarketOrder(web3.utils.fromAscii("TOKEN-DOES-NOT-EXIST"), web3.utils.toWei("1000"), SIDE.BUY, { from: trader1 }), "this token does not exist");
-    // });
 
 
 
