@@ -162,7 +162,7 @@ contract("Decentralized Exchange", (accounts) => {
     
         const orders = await decentralizedexchange.getOrders(HLX, SIDE.BUY);
         assert(orders.length === 1);
-        assert(orders[0].filled = web3.utils.toWei("5"));
+        assert(orders[0].filled === web3.utils.toWei("5"));
         assert(balances[0].toString() === web3.utils.toWei("50"));
         assert(balances[1].toString() === web3.utils.toWei("5"));
         assert(balances[2].toString() === web3.utils.toWei("50"));
