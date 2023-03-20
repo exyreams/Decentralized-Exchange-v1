@@ -64,6 +64,7 @@ contract("Decentralized Exchange", (accounts) => {
             "This token doesn't exist."
         );
     });
+
     //function for testing withdraw
     it("Should Withdraw Tokens.", async () => {
         const amount = web3.utils.toWei("100");
@@ -84,6 +85,12 @@ contract("Decentralized Exchange", (accounts) => {
             "This token doesn't exist."
         );
     });
+    
+    it("Shouldn't Withdraw Tokens: When balance too low.", async () => {
+        await decentralizedexchange.deposit(web3.utils.toWei("100"),FNX,{from: trader1});
+        await expectRevert(decentralizedexchange.withdraw(web3.utils.toWei("1000"), FNX, {from: trader1}),"Balance isn't enough to Withdraw Tokens.");
+    });
+
     //function for testing LimitOrders
     it("Should Create Limit Order.", async () => {
         await decentralizedexchange.deposit(web3.utils.toWei("100"), FNX, { from: trader1 });
@@ -124,11 +131,6 @@ contract("Decentralized Exchange", (accounts) => {
         await decentralizedexchange.deposit(web3.utils.toWei("99"), HLX, { from: trader1 });
         await expectRevert(decentralizedexchange.createLimitOrder(HLX, web3.utils.toWei("100"), 10, SIDE.SELL, { from: trader1 }), "Token balance is too low.");
     });
-
-    it("Shouldn't Create Limit Order: When token balance is too Low.", async () => {
-        await decentralizedexchange.deposit(web3.utils.toWei("99"), HLX, { from: trader1 });
-        await expectRevert(decentralizedexchange.createLimitOrder(HLX, web3.utils.toWei("100"), 10, SIDE.SELL, { from: trader1 }), "Token balance is too low");
-    });
     
     it("Shouldn't Create Limit Order: When FNX balance too low.", async () => {
         await decentralizedexchange.deposit(web3.utils.toWei("99"), FNX, { from: trader1 });
@@ -143,6 +145,7 @@ contract("Decentralized Exchange", (accounts) => {
         await expectRevert(decentralizedexchange.createLimitOrder(web3.utils.fromAscii("TOKEN-DOES-NOT-EXIST"), web3.utils.toWei("1000"), 10, SIDE.BUY,
             { from: trader1 }), "This token doesn't exist.");
     });
+
     //function for testing marketOrders
     it("Should create Market Order & Match.", async () => {
         await decentralizedexchange.deposit(web3.utils.toWei("100"), FNX, { from: trader1 });
@@ -167,20 +170,20 @@ contract("Decentralized Exchange", (accounts) => {
     });
     
     it("Shouldn't Create Market Order: When token balance too low.", async () => {
-        await expectRevert(decentralizedexchange.createMarketOrder(HLX, web3.utils.toWei("101"), SIDE.SELL, { from: trader2 }), "Token balance is too low");
+        await expectRevert(decentralizedexchange.createMarketOrder(HLX, web3.utils.toWei("101"), SIDE.SELL, { from: trader2 }), "Token balance is too low.");
     });
     
     it("Shouldn't Create Market Order: When FNX balance too low.", async () => {
         await decentralizedexchange.deposit(web3.utils.toWei("100"), HLX, { from: trader1 });
         await decentralizedexchange.createLimitOrder(HLX, web3.utils.toWei("100"), 10, SIDE.SELL, { from: trader1 });
-        await expectRevert(decentralizedexchange.createMarketOrder(HLX, web3.utils.toWei("101"), SIDE.BUY, { from: trader2 }), "FNX balance too low.");
+        await expectRevert(decentralizedexchange.createMarketOrder(HLX, web3.utils.toWei("101"), SIDE.BUY, { from: trader2 }), "FNX balance is too low.");
     });
     
     it("Shouldn't Create Market Order: When token is FNX.", async () => {
         await expectRevert(decentralizedexchange.createMarketOrder(FNX, web3.utils.toWei("1000"), SIDE.BUY, { from: trader1 }), "Cannot trade FNX.");
     });
     
-    it("Shouldn't Create Market Order: When token does not not exist.", async () => {
+    it("Shouldn't Create Market Order: When token does not exist.", async () => {
         await expectRevert(decentralizedexchange.createMarketOrder(web3.utils.fromAscii("TOKEN-DOES-NOT-EXIST"), web3.utils.toWei("1000"), SIDE.BUY, { from: trader1 }), "This token doesn't exist.");
     });
 

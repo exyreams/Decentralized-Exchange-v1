@@ -144,7 +144,7 @@ contract DecentralizedExchange {
 
     function createMarketOrder(bytes32 ticker,uint256 amount,Side side) external tokenExist(ticker) tokenIsNotFNX(ticker) {
         if (side == Side.SELL) {
-            require(traderBalances[msg.sender][ticker] >= amount,"Token balance it too low.");
+            require(traderBalances[msg.sender][ticker] >= amount,"Token balance is too low.");
         }
         Order[] storage orders = orderBook[ticker][uint256(side == Side.BUY ? Side.SELL : Side.BUY)];
         uint256 i;
