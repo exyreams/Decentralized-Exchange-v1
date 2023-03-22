@@ -142,9 +142,9 @@ contract DecentralizedExchange {
         nextorderId = nextorderId.add(1);
     }
 
-    function createMarketOrder(bytes32 ticker,uint256 amount,Side side) external tokenExist(ticker) tokenIsNotFNX(ticker) {
+    function createMarketOrder(bytes32 ticker, uint256 amount, Side side) external tokenExist(ticker) tokenIsNotFNX(ticker) {
         if (side == Side.SELL) {
-            require(traderBalances[msg.sender][ticker] >= amount,"Token balance is too low.");
+            require(traderBalances[msg.sender][ticker] >= amount, "Token balance is too low.");
         }
         Order[] storage orders = orderBook[ticker][uint256(side == Side.BUY ? Side.SELL : Side.BUY)];
         uint256 i;
@@ -167,16 +167,16 @@ contract DecentralizedExchange {
             );
             if (side == Side.SELL) {
                 traderBalances[msg.sender][ticker] = traderBalances[msg.sender][ticker].sub(matched);
-                traderBalances[msg.sender][FNX] = traderBalances[msg.sender][FNX].add(matched).mul(orders[i].price);
+                traderBalances[msg.sender][FNX] = traderBalances[msg.sender][FNX].add(matched.mul(orders[i].price));
                 traderBalances[orders[i].trader][ticker] = traderBalances[orders[i].trader][ticker].add(matched);
-                traderBalances[orders[i].trader][FNX] = traderBalances[orders[i].trader][FNX].sub(matched).mul(orders[i].price);
+                traderBalances[orders[i].trader][FNX] = traderBalances[orders[i].trader][FNX].sub(matched.mul(orders[i].price));
             }
             if (side == Side.BUY) {
-                require(traderBalances[msg.sender][FNX] >=matched.mul(orders[i].price),"FNX balance is too low.");
+                require(traderBalances[msg.sender][FNX] >= matched.mul(orders[i].price), "FNX balance is too low.");
                 traderBalances[msg.sender][ticker] = traderBalances[msg.sender][ticker].add(matched);
-                traderBalances[msg.sender][FNX] = traderBalances[orders[i].trader][ticker].sub(matched).mul(orders[i].price);
+                traderBalances[msg.sender][FNX] = traderBalances[msg.sender][FNX].sub(matched.mul(orders[i].price));
                 traderBalances[orders[i].trader][ticker] = traderBalances[orders[i].trader][ticker].sub(matched);
-                traderBalances[orders[i].trader][FNX] = traderBalances[orders[i].trader][FNX].add(matched).mul(orders[i].price);
+                traderBalances[orders[i].trader][FNX] = traderBalances[orders[i].trader][FNX].add(matched.mul(orders[i].price));
             }
             nextTradeId = nextTradeId.add(1);
             i = i.add(1);
@@ -192,3 +192,4 @@ contract DecentralizedExchange {
         }
     }
 }
+
