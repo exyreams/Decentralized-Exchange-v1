@@ -95,7 +95,7 @@ contract DecentralizedExchange {
     }
 
     function withdraw(uint256 amount, bytes32 ticker) external tokenExist(ticker){
-        require(traderBalances[msg.sender][ticker] >= amount,"Balance isn't enough to Withdraw Tokens.");
+        require(traderBalances[msg.sender][ticker] >= amount,"Balance isn't enough to withdraw tokens.");
         traderBalances[msg.sender][ticker] = traderBalances[msg.sender][ticker].sub(amount);
         IERC20(tokens[ticker].tokenAddress).transfer(msg.sender, amount);
     }
