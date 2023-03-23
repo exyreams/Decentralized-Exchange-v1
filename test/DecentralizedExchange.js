@@ -49,6 +49,9 @@ contract("Decentralized Exchange", (accounts) => {
             await seedTokenBalance(token, trader1);
             await seedTokenBalance(token, trader2);
         }
+        // await Promise.all([aug, emp, fnx, hlx, qtm, srs, zrc].map(token => seedTokenBalance(token, trader1)));
+        // await Promise.all([aug, emp, fnx, hlx, qtm, srs, zrc].map(token => seedTokenBalance(token, trader2)));
+
     });
 
     //function for testing deposits
