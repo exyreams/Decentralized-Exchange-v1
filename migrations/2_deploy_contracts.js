@@ -68,7 +68,7 @@ module.exports = async function (deployer, _network, accounts) {
   await increaseTime(1);
   await decentralizedexchange.createLimitOrder(AUG, 2000, 12, SIDE.BUY, { from: trader1 });
   await decentralizedexchange.createMarketOrder(AUG, 2000, SIDE.SELL, { from: trader2 });
-
+ 
   await decentralizedexchange.createLimitOrder(HLX, 1000, 2, SIDE.BUY, { from: trader1 });
   await decentralizedexchange.createMarketOrder(HLX, 1000, SIDE.SELL, { from: trader2 });
   await increaseTime(1);
