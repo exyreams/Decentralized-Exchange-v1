@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import DecentralizedExchange from "./contracts/DecentralizedExchange";
+import DecentralizedExchange from "./DecentralizedExchange.json";
 import ERC20Abi from "./ERC20Abi.json";
 
 const getWeb3 = () => {
