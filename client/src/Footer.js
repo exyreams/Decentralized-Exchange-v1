@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
 const Footer = () => {
   return (
     <footer>
       <p className="text-center">
-        From  <a href="http://pro.eattheblocks.com" style={{ color: 'white' }}>6-Figures Blockchain dev</a>, a Blockchain course to become a Professional Blockchain developer
+        Empower yourself with the decentralized exchange, a platform that puts you in control. That Decentralized Exchange is designed to deliver fast and secure transactions, so you can trade with confidence and ease. <a href="----" style={{  color: 'white' }}> - exyreams</a>
       </p>
     </footer>
   );

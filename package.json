@@ -13,10 +13,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@metamask/providers": "^10.2.1",
     "@openzeppelin/contracts": "^4.8.1",
     "chai-truffle": "^0.2.3",
     "solc": "^0.8.19",
-    "truffle-assertions": "^0.9.2"
+    "truffle-assertions": "^0.9.2",
+    "web3": "^1.9.0"
   },
   "devDependencies": {
     "@openzeppelin/test-helpers": "^0.5.16"

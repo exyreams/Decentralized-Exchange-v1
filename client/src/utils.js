@@ -1,42 +1,22 @@
 import Web3 from "web3";
+import ERC20Abi from "./ERC20Abi.json"
 import DecentralizedExchange from "./DecentralizedExchange.json";
-import ERC20Abi from "./ERC20Abi.json";
+import detectEthereumProvider from "@metamask/detect-provider";
 
-const getWeb3 = () => {
-    return new Promise((resolve, reject) => {
-        // Wait for loading completion to avoid race conditions with web3 injection timing.
-        window.addEventListener("load", async () => {
-            // Modern dapp browsers...
-            if (window.ethereum) {
+const getWeb3 = () =>
+    new Promise(async (resolve, reject) => {
+        let provider = await detectEthereumProvider();
+        if (provider) {
+            await provider.request({ method: "eth_requestAccounts" });
+            try {
                 const web3 = new Web3(window.ethereum);
-                try {
-                    // Request account access if needed
-                    await window.ethereum.enable();
-                    // Accounts now exposed
-                    resolve(web3);
-                } catch (error) {
-                    reject(error);
-                }
-            }
-            // Legacy dapp browsers...
-            else if (window.web3) {
-                // Use Mist/MetaMask's provider.
-                const web3 = window.web3;
-                console.log("Injected web3 detected.");
                 resolve(web3);
+            } catch (error) {
+                reject(error);
             }
-            // Fallback to localhost; use dev console port by default...
-            else {
-                const provider = new Web3.providers.HttpProvider(
-                    "http://localhost:9545"
-                );
-                const web3 = new Web3(provider);
-                console.log("No web3 instance injected, using Local web3.");
-                resolve(web3);
-            }
-        });
+        }
+        reject("Install Metamask");
     });
-};
 
 const getContracts = async web3 => {
     const networkId = await web3.eth.net.getId();
@@ -45,7 +25,7 @@ const getContracts = async web3 => {
         DecentralizedExchange.abi,
         deployedNetwork && deployedNetwork.address,
     );
-    const tokens = await decentralizedexchange.methods.getTokens().call();
+    const tokens = await decentralizedexchange.methods.getTokens.call();
     const tokenContracts = tokens.reduce((acc, token) => ({
         ...acc,
         [web3.utils.hexToUtf8(token.ticker)]: new web3.eth.Contract(
@@ -56,4 +36,4 @@ const getContracts = async web3 => {
     return { decentralizedexchange, ...tokenContracts };
 }
 
-export { getWeb3, getContracts };
+export { getWeb3, getContracts };                
