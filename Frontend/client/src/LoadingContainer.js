@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { getWeb3, getContracts } from './utils.js';
-import App from './App.js';
+import { getWeb3, getContracts } from "./utils.js";
+import App from "./App.js";
 
 function LoadingContainer() {
   const [web3, setWeb3] = useState(undefined);
@@ -22,8 +22,8 @@ function LoadingContainer() {
 
   const isReady = () => {
     return (
-      typeof web3 !== 'undefined' 
-      && typeof contracts !== 'undefined'
+      typeof web3 !== "undefined" 
+      && typeof contracts !== "undefined"
       && accounts.length > 0
     );
   }

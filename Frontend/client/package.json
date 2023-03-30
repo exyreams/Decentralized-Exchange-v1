@@ -10,6 +10,7 @@
     "@web3modal/ethereum": "^2.2.2",
     "@web3modal/react": "^2.2.2",
     "bootstrap": "^5.2.3",
+    "connectkit": "^1.2.1",
     "ethers": "^5.7.2",
     "moment": "^2.29.4",
     "postcss": "^8.4.21",
@@ -19,7 +20,7 @@
     "react-scripts": "^5.0.1",
     "recharts": "^2.5.0",
     "sass": "^1.60.0",
-    "wagmi": "^0.12.7",
+    "wagmi": "^0.11.7",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
