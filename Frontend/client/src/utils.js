@@ -4,14 +4,14 @@ import DecentralizedExchange from "./contracts/DecentralizedExchange.json";
 import ERC20Abi from "./ERC20Abi.json";
 
 const getWeb3 = () =>
-  new Promise( async (resolve, reject) => {
+  new Promise(async (resolve, reject) => {
     let provider = await detectEthereumProvider();
-    if(provider) {
+    if (provider) {
       await provider.request({ method: "eth_requestAccounts" });
       try {
         const web3 = new Web3(window.ethereum);
         resolve(web3);
-      } catch(error) {
+      } catch (error) {
         reject(error);
       }
     }
@@ -19,13 +19,19 @@ const getWeb3 = () =>
   });
 
 const getContracts = async web3 => {
-  const networkId = await web3.eth.net.getId();
+  const networkId = "5777";
   const deployedNetwork = DecentralizedExchange.networks[networkId];
   const decentralizedexchange = new web3.eth.Contract(
     DecentralizedExchange.abi,
     deployedNetwork && deployedNetwork.address,
   );
-  const tokens = await decentralizedexchange.methods.getTokens().call();
+  let tokens;
+  try {
+    tokens = await decentralizedexchange.methods.getTokens().call();
+  } catch (error) {
+    console.error("Error getting tokens:", error);
+    tokens = [];
+  }
   const tokenContracts = tokens.reduce((acc, token) => ({
     ...acc,
     [web3.utils.hexToUtf8(token.ticker)]: new web3.eth.Contract(
@@ -35,5 +41,6 @@ const getContracts = async web3 => {
   }), {});
   return { decentralizedexchange, ...tokenContracts };
 }
+
 
 export { getWeb3, getContracts };

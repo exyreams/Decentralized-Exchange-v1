@@ -66,9 +66,9 @@ module.exports = async function (deployer, _network, accounts) {
   await decentralizedexchange.createLimitOrder(AUG, 1500, 14, SIDE.BUY, { from: trader1 });
   await decentralizedexchange.createMarketOrder(AUG, 1500, SIDE.SELL, { from: trader2 });
   await increaseTime(1);
-  await decentralizedexchange.createLimitOrder(AUG, 2000, 12, SIDE.BUY, { from: trader1 });
-  await decentralizedexchange.createMarketOrder(AUG, 2000, SIDE.SELL, { from: trader2 });
- 
+  await decentralizedexchange.createLimitOrder(AUG, 1300, 12, SIDE.BUY, { from: trader1 });
+  await decentralizedexchange.createMarketOrder(AUG, 1300, SIDE.SELL, { from: trader2 });
+
   await decentralizedexchange.createLimitOrder(HLX, 1000, 2, SIDE.BUY, { from: trader1 });
   await decentralizedexchange.createMarketOrder(HLX, 1000, SIDE.SELL, { from: trader2 });
   await increaseTime(1);
@@ -96,14 +96,14 @@ module.exports = async function (deployer, _network, accounts) {
   await decentralizedexchange.createLimitOrder(SRS, 600, 3, SIDE.BUY, { from: trader1 });
   await decentralizedexchange.createMarketOrder(SRS, 600, SIDE.SELL, { from: trader2 });
 
-  await decentralizedexchange.createLimitOrder(ZRC, 1500, 1, SIDE.BUY, { from: trader1 });
-  await decentralizedexchange.createMarketOrder(ZRC, 1500, SIDE.SELL, { from: trader2 });
+  await decentralizedexchange.createLimitOrder(ZRC, 1400, 1, SIDE.BUY, { from: trader1 });
+  await decentralizedexchange.createMarketOrder(ZRC, 1400, SIDE.SELL, { from: trader2 });
   await increaseTime(1);
-  await decentralizedexchange.createLimitOrder(ZRC, 1200, 2, SIDE.BUY, { from: trader1 });
+  await decentralizedexchange.createLimitOrder(ZRC, 1000, 2, SIDE.BUY, { from: trader1 });
+  await decentralizedexchange.createMarketOrder(ZRC, 1000, SIDE.SELL, { from: trader2 });
+  await increaseTime(1);
+  await decentralizedexchange.createLimitOrder(ZRC, 1200, 3, SIDE.BUY, { from: trader1 });
   await decentralizedexchange.createMarketOrder(ZRC, 1200, SIDE.SELL, { from: trader2 });
-  await increaseTime(1);
-  await decentralizedexchange.createLimitOrder(ZRC, 1800, 3, SIDE.BUY, { from: trader1 });
-  await decentralizedexchange.createMarketOrder(ZRC, 1800, SIDE.SELL, { from: trader2 });
 
   //create orders
   await Promise.all([
@@ -111,12 +111,12 @@ module.exports = async function (deployer, _network, accounts) {
     decentralizedexchange.createLimitOrder(AUG, 1200, 11, SIDE.BUY, { from: trader2 }),
     decentralizedexchange.createLimitOrder(AUG, 1000, 12, SIDE.BUY, { from: trader2 }),
 
-    decentralizedexchange.createLimitOrder(EMP, 1500, 23, SIDE.SELL, { from: trader3 }),
-    decentralizedexchange.createLimitOrder(EMP, 1200, 22, SIDE.SELL, { from: trader3 }),
+    decentralizedexchange.createLimitOrder(EMP, 680, 23, SIDE.SELL, { from: trader3 }),
+    decentralizedexchange.createLimitOrder(EMP, 845, 22, SIDE.SELL, { from: trader3 }),
     decentralizedexchange.createLimitOrder(EMP, 900, 21, SIDE.SELL, { from: trader4 }),
 
-    decentralizedexchange.createLimitOrder(EMP, 4000, 12, SIDE.BUY, { from: trader1 }),
-    decentralizedexchange.createLimitOrder(EMP, 3000, 13, SIDE.BUY, { from: trader1 }),
+    decentralizedexchange.createLimitOrder(EMP, 400, 12, SIDE.BUY, { from: trader1 }),
+    decentralizedexchange.createLimitOrder(EMP, 250, 13, SIDE.BUY, { from: trader1 }),
     decentralizedexchange.createLimitOrder(EMP, 500, 14, SIDE.BUY, { from: trader2 }),
 
     decentralizedexchange.createLimitOrder(HLX, 4000, 10, SIDE.SELL, { from: trader3 }),
@@ -131,7 +131,7 @@ module.exports = async function (deployer, _network, accounts) {
     decentralizedexchange.createLimitOrder(QTM, 600, 8, SIDE.BUY, { from: trader2 }),
     decentralizedexchange.createLimitOrder(QTM, 400, 10, SIDE.BUY, { from: trader2 }),
 
-    decentralizedexchange.createLimitOrder(SRS, 1000, 1, SIDE.BUY, { from: trader1 }),
+    decentralizedexchange.createLimitOrder(SRS, 100, 1, SIDE.BUY, { from: trader1 }),
     decentralizedexchange.createLimitOrder(SRS, 800, 2, SIDE.BUY, { from: trader1 }),
     decentralizedexchange.createLimitOrder(SRS, 500, 3, SIDE.BUY, { from: trader2 }),
 
@@ -139,12 +139,12 @@ module.exports = async function (deployer, _network, accounts) {
     decentralizedexchange.createLimitOrder(QTM, 1200, 10, SIDE.SELL, { from: trader4 }),
     decentralizedexchange.createLimitOrder(QTM, 500, 9, SIDE.SELL, { from: trader4 }),
 
-    decentralizedexchange.createLimitOrder(AUG, 2000, 16, SIDE.SELL, { from: trader3 }),
-    decentralizedexchange.createLimitOrder(AUG, 3000, 15, SIDE.SELL, { from: trader4 }),
+    decentralizedexchange.createLimitOrder(AUG, 888, 16, SIDE.SELL, { from: trader3 }),
+    decentralizedexchange.createLimitOrder(AUG, 950, 15, SIDE.SELL, { from: trader4 }),
     decentralizedexchange.createLimitOrder(AUG, 500, 14, SIDE.SELL, { from: trader4 }),
 
-    decentralizedexchange.createLimitOrder(ZRC, 2000, 4, SIDE.BUY, { from: trader1 }),
-    decentralizedexchange.createLimitOrder(ZRC, 1500, 5, SIDE.BUY, { from: trader1 }),
+    decentralizedexchange.createLimitOrder(ZRC, 450, 4, SIDE.BUY, { from: trader1 }),
+    decentralizedexchange.createLimitOrder(ZRC, 500, 5, SIDE.BUY, { from: trader1 }),
     decentralizedexchange.createLimitOrder(ZRC, 800, 6, SIDE.BUY, { from: trader2 }),
 
     decentralizedexchange.createLimitOrder(SRS, 300, 4, SIDE.SELL, { from: trader3 }),
